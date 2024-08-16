@@ -3,34 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <title>Dashboard</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+        #results {
+            border: 1px solid #ccc;
+            max-width: 300px;
+            list-style: none;
+            padding: 0;
+            margin-top: 5px;
         }
-        .dashboard-container {
-            background-color: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
+
+        #results li {
+            padding: 8px;
+            cursor: pointer;
         }
-        .dashboard-container h2 {
-            margin-bottom: 20px;
+
+        #results li:hover {
+            background-color: #f0f0f0;
         }
     </style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <h2>Welcome to your dashboard!</h2>
-        <p>You are logged in as user {{ user_id }}.</p>
-        <a href="{{ url_for('logout') }}" class="btn btn-danger">Logout</a>
-    </div>
+    <h1>Welcome to the Insurance Database Management</h1>
+    <p>User ID: {{ user_id }}</p>
+    
+    <h2>Search Customers</h2>
+    <input type="text" id="searchBar" placeholder="Start typing a name..." onkeyup="searchCustomers()">
+    <ul id="results"></ul>
+
+    <h2>All Users</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Email</th>
+            <th>Actions</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+                <a href="{{ url_for('dashboard.delete_user', user_id=user.id) }}">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>All Customers</h2>
+    <table>
+        <tr>
+            <th><a href="{{ url_for('dashboard.dashboard', sort_by='id', sort_order='asc' if sort_by != 'id' or sort_order == 'desc' else 'desc') }}">ID</a></th>
+            <th><a href="{{ url_for('dashboard.dashboard', sort_by='name', sort_order='asc' if sort_by != 'name' or sort_order == 'desc' else 'desc') }}">Name</a></th>
+            <th><a href="{{ url_for('dashboard.dashboard', sort_by='lastname', sort_order='asc' if sort_by != 'lastname' or sort_order == 'desc' else 'desc') }}">Last Name</a></th>
+            <th><a href="{{ url_for('dashboard.dashboard', sort_by='age', sort_order='asc' if sort_by != 'age' or sort_order == 'desc' else 'desc') }}">Age</a></th>
+            <th><a href="{{ url_for('dashboard.dashboard', sort_by='insurance_premium', sort_order='asc' if sort_by != 'insurance_premium' or sort_order == 'desc' else 'desc') }}">Insurance Premium</a></th>
+            <th><a href="{{ url_for('dashboard.dashboard', sort_by='organization', sort_order='asc' if sort_by != 'organization' or sort_order == 'desc' else 'desc') }}">Organization</a></th>
+            <th>Actions</th>
+        </tr>
+        {% for customer in customers %}
+        <tr>
+            <td>{{ customer.id }}</td>
+            <td>{{ customer.name }}</td>
+            <td>{{ customer.lastname }}</td>
+            <td>{{ customer.age }}</td>
+            <td>{{ customer.insurance_premium }}</td>
+            <td>{{ customer.organization }}</td>
+            <td>
+                <a href="{{ url_for('dashboard.edit_customer', customer_id=customer.id) }}">Edit</a>
+                <a href="{{ url_for('dashboard.delete_customer', customer_id=customer.id) }}">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <a href="{{ url_for('dashboard.add_customer') }}">Add Customer</a>
+    <a href="{{ url_for('dashboard.logout') }}">Logout</a>
+
+    <script>
+        function searchCustomers() {
+            let query = document.getElementById('searchBar').value;
+            if (query.length > 0) {
+                fetch(`/search_customers?name=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        let results = document.getElementById('results');
+                        results.innerHTML = '';
+
+                        data.customers.forEach(customer => {
+                            let li = document.createElement('li');
+                            let link = document.createElement('a');
+                            link.href = `/customer/${customer.id}`;
+                            link.textContent = `${customer.name} ${customer.lastname}`;
+                            li.appendChild(link);
+                            results.appendChild(li);
+                        });
+
+                        data.organizations.forEach(org => {
+                            let li = document.createElement('li');
+                            let link = document.createElement('a');
+                            link.href = `/organization/${encodeURIComponent(org.organization)}`;
+                            link.textContent = `Organization: ${org.organization}`;
+                            li.appendChild(link);
+                            results.appendChild(li);
+                        });
+                    });
+            } else {
+                document.getElementById('results').innerHTML = '';
+            }
+        }
+    </script>
 </body>
+
 </html>

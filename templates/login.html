@@ -2,55 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sign in</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .login-container {
-            background-color: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        .login-container h2 {
-            margin-bottom: 20px;
-        }
-        .login-container .form-group {
-            margin-bottom: 20px;
-        }
-        .login-container .btn {
-            width: 100%;
-        }
-        .login-container a {
-            display: block;
-            margin-top: 10px;
-            color: #4285f4;
-        }
-    </style>
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="login-container">
-        <h2>Sign in</h2>
-        <form action="{{ url_for('do_login') }}" method="POST">
-            <div class="form-group">
-                <input type="email" class="form-control" name="email" placeholder="Email or phone" required>
-            </div>
-            <div class="form-group">
-                <input type="password" class="form-control" name="password" placeholder="Password" required>
-            </div>
-            <a href="#">Forgot email?</a>
-            <button type="submit" class="btn btn-primary">Next</button>
-            <a href="{{ url_for('register') }}">Create account</a>
-        </form>
-    </div>
+    <h1>Login</h1>
+    <form method="POST" action="{{ url_for('do_login') }}">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br>
+        <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a>.</p>
 </body>
 </html>
